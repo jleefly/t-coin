@@ -9,7 +9,6 @@ Copyright (c) 2016 T-Coin Developers
 - **ALGORITHM:** Scrypt
 - **SYMBOL:** TRC
 - **BLOCK TIME:** 60 sec
-- **BLOCK REWARD:** BLOCKS 1-10 (premine): each 11,520,000,000 TRC / BLOCKS 11~3600: 100 TRC / BLOCKS 3601~: 1 TRC
 - **COIN POS AGE:** Min. 1 hour / Max. unlimited
 - **RPC PORT:** 25287 (testnet 35287 )
 - **P2P PORT:** 25286 (testnet 35286 )
