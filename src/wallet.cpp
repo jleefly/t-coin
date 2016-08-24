@@ -23,55 +23,55 @@ int64_t nStakeCombineThreshold = 1000 * COIN;
 // mapWallet
 //
 
-struct CompareValueOnly
-{
-    bool operator()(const pair<int64_t, pair<const CWalletTx*, unsigned int> >& t1,
-                    const pair<int64_t, pair<const CWalletTx*, unsigned int> >& t2) const
-    {
-        return t1.first < t2.first;
-    }
-};
+//struct CompareValueOnly
+//{
+//    bool operator()(const pair<int64_t, pair<const CWalletTx*, unsigned int> >& t1,
+//                    const pair<int64_t, pair<const CWalletTx*, unsigned int> >& t2) const
+//    {
+//        return t1.first < t2.first;
+//    }
+//};
 
-CPubKey CWallet::GenerateNewKey()
-{
-    AssertLockHeld(cs_wallet); // mapKeyMetadata
-    bool fCompressed = CanSupportFeature(FEATURE_COMPRPUBKEY); // default to compressed public keys if we want 0.6.0 wallets
+//CPubKey CWallet::GenerateNewKey()
+//{
+//    AssertLockHeld(cs_wallet); // mapKeyMetadata
+//    bool fCompressed = CanSupportFeature(FEATURE_COMPRPUBKEY); // default to compressed public keys if we want 0.6.0 wallets
 
-    RandAddSeedPerfmon();
-    CKey key;
-    key.MakeNewKey(fCompressed);
+//    RandAddSeedPerfmon();
+//    CKey key;
+//    key.MakeNewKey(fCompressed);
 
     // Compressed public keys were introduced in version 0.6.0
-    if (fCompressed)
-        SetMinVersion(FEATURE_COMPRPUBKEY);
+//    if (fCompressed)/
+//        SetMinVersion(FEATURE_COMPRPUBKEY);
 
-    CPubKey pubkey = key.GetPubKey();
+//    CPubKey pubkey = key.GetPubKey();
 
     // Create new metadata
-    int64_t nCreationTime = GetTime();
-    mapKeyMetadata[pubkey.GetID()] = CKeyMetadata(nCreationTime);
-    if (!nTimeFirstKey || nCreationTime < nTimeFirstKey)
-        nTimeFirstKey = nCreationTime;
+//    int64_t nCreationTime = GetTime();
+//    mapKeyMetadata[pubkey.GetID()] = CKeyMetadata(nCreationTime);
+//    if (!nTimeFirstKey || nCreationTime < nTimeFirstKey)
+//        nTimeFirstKey = nCreationTime;
 
-    if (!AddKey(key))
-        throw std::runtime_error("CWallet::GenerateNewKey() : AddKey failed");
-    return key.GetPubKey();
-}
+//    if (!AddKey(key))
+//        throw std::runtime_error("CWallet::GenerateNewKey() : AddKey failed");
+//    return key.GetPubKey();
+//}
 
-bool CWallet::AddKey(const CKey& key)
-{
-    AssertLockHeld(cs_wallet); // mapKeyMetadata
+//bool CWallet::AddKey(const CKey& key)
+//{
+//    AssertLockHeld(cs_wallet); // mapKeyMetadata
 
-    CPubKey pubkey = key.GetPubKey();
+//    CPubKey pubkey = key.GetPubKey();
 
-    if (!CCryptoKeyStore::AddKey(key))
-        return false;
-    if (!fFileBacked)
-        return true;
-    if (!IsCrypted())
-        return CWalletDB(strWalletFile).WriteKey(pubkey, key.GetPrivKey(), mapKeyMetadata[pubkey.GetID()]);
-    return true;
-}
+//    if (!CCryptoKeyStore::AddKey(key))
+//        return false;
+//  if (!fFileBacked)
+//        return true;
+//    if (!IsCrypted())
+//        return CWalletDB(strWalletFile).WriteKey(pubkey, key.GetPrivKey(), mapKeyMetadata[pubkey.GetID()]);
+//    return true;
+//}
 
 bool CWallet::AddCryptedKey(const CPubKey &vchPubKey, const vector<unsigned char> &vchCryptedSecret)
 {
