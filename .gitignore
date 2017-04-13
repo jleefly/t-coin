@@ -12,7 +12,7 @@ src/t-coind
 .qmake.stash
 T-Coin-Qt.app/
 T-Coin-Qt.dmg
-Makefile
+./Makefile
 dist/
 qrc_bitcoin.cpp
 qrc_qlightstyle.cpp
