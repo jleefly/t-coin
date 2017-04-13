@@ -5,13 +5,13 @@
 *.bak
 *.log
 src/obj/*
-src/hicoind
+src/t-coind
 [Rr]elease*/
 [Db]uild/
 .DS_Store
 .qmake.stash
-HiCoin-Qt.app/
-HiCoin-Qt.dmg
+T-Coin-Qt.app/
+T-Coin-Qt.dmg
 Makefile
 dist/
 qrc_bitcoin.cpp
