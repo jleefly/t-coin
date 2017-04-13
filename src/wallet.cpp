@@ -23,55 +23,55 @@ int64_t nStakeCombineThreshold = 1000 * COIN;
 // mapWallet
 //
 
-//struct CompareValueOnly
-//{
-//    bool operator()(const pair<int64_t, pair<const CWalletTx*, unsigned int> >& t1,
-//                    const pair<int64_t, pair<const CWalletTx*, unsigned int> >& t2) const
-//    {
-//        return t1.first < t2.first;
-//    }
-//};
+struct CompareValueOnly
+{
+    bool operator()(const pair<int64_t, pair<const CWalletTx*, unsigned int> >& t1,
+                    const pair<int64_t, pair<const CWalletTx*, unsigned int> >& t2) const
+    {
+        return t1.first < t2.first;
+    }
+};
 
-//CPubKey CWallet::GenerateNewKey()
-//{
-//    AssertLockHeld(cs_wallet); // mapKeyMetadata
-//    bool fCompressed = CanSupportFeature(FEATURE_COMPRPUBKEY); // default to compressed public keys if we want 0.6.0 wallets
+CPubKey CWallet::GenerateNewKey()
+{
+    AssertLockHeld(cs_wallet); // mapKeyMetadata
+    bool fCompressed = CanSupportFeature(FEATURE_COMPRPUBKEY); // default to compressed public keys if we want 0.6.0 wallets
 
-//    RandAddSeedPerfmon();
-//    CKey key;
-//    key.MakeNewKey(fCompressed);
+    RandAddSeedPerfmon();
+    CKey key;
+    key.MakeNewKey(fCompressed);
 
     // Compressed public keys were introduced in version 0.6.0
-//    if (fCompressed)/
-//        SetMinVersion(FEATURE_COMPRPUBKEY);
+    if (fCompressed)
+        SetMinVersion(FEATURE_COMPRPUBKEY);
 
-//    CPubKey pubkey = key.GetPubKey();
+    CPubKey pubkey = key.GetPubKey();
 
     // Create new metadata
-//    int64_t nCreationTime = GetTime();
-//    mapKeyMetadata[pubkey.GetID()] = CKeyMetadata(nCreationTime);
-//    if (!nTimeFirstKey || nCreationTime < nTimeFirstKey)
-//        nTimeFirstKey = nCreationTime;
+    int64_t nCreationTime = GetTime();
+    mapKeyMetadata[pubkey.GetID()] = CKeyMetadata(nCreationTime);
+    if (!nTimeFirstKey || nCreationTime < nTimeFirstKey)
+        nTimeFirstKey = nCreationTime;
 
-//    if (!AddKey(key))
-//        throw std::runtime_error("CWallet::GenerateNewKey() : AddKey failed");
-//    return key.GetPubKey();
-//}
+    if (!AddKey(key))
+        throw std::runtime_error("CWallet::GenerateNewKey() : AddKey failed");
+    return key.GetPubKey();
+}
 
-//bool CWallet::AddKey(const CKey& key)
-//{
-//    AssertLockHeld(cs_wallet); // mapKeyMetadata
+bool CWallet::AddKey(const CKey& key)
+{
+    AssertLockHeld(cs_wallet); // mapKeyMetadata
 
-//    CPubKey pubkey = key.GetPubKey();
+    CPubKey pubkey = key.GetPubKey();
 
-//    if (!CCryptoKeyStore::AddKey(key))
-//        return false;
-//  if (!fFileBacked)
-//        return true;
-//    if (!IsCrypted())
-//        return CWalletDB(strWalletFile).WriteKey(pubkey, key.GetPrivKey(), mapKeyMetadata[pubkey.GetID()]);
-//    return true;
-//}
+    if (!CCryptoKeyStore::AddKey(key))
+        return false;
+    if (!fFileBacked)
+        return true;
+    if (!IsCrypted())
+        return CWalletDB(strWalletFile).WriteKey(pubkey, key.GetPrivKey(), mapKeyMetadata[pubkey.GetID()]);
+    return true;
+}
 
 bool CWallet::AddCryptedKey(const CPubKey &vchPubKey, const vector<unsigned char> &vchCryptedSecret)
 {
@@ -454,7 +454,7 @@ void CWallet::WalletUpdateSpent(const CTransaction &tx, bool fBlock)
                     printf("WalletUpdateSpent: bad wtx %s\n", wtx.GetHash().ToString().c_str());
                 else if (!wtx.IsSpent(txin.prevout.n) && IsMine(wtx.vout[txin.prevout.n]))
                 {
-                    printf("WalletUpdateSpent found spent coin %s TRC %s\n", FormatMoney(wtx.GetCredit()).c_str(), wtx.GetHash().ToString().c_str());
+                    printf("WalletUpdateSpent found spent coin %s FSC2 %s\n", FormatMoney(wtx.GetCredit()).c_str(), wtx.GetHash().ToString().c_str());
                     wtx.MarkSpent(txin.prevout.n);
                     wtx.WriteToDisk();
                     NotifyTransactionChanged(this, txin.prevout.hash, CT_UPDATED);
@@ -997,7 +997,7 @@ void CWallet::ReacceptWalletTransactions()
                 }
                 if (fUpdated)
                 {
-                    printf("ReacceptWalletTransactions found spent coin %s TRC %s\n", FormatMoney(wtx.GetCredit()).c_str(), wtx.GetHash().ToString().c_str());
+                    printf("ReacceptWalletTransactions found spent coin %s FSC2 %s\n", FormatMoney(wtx.GetCredit()).c_str(), wtx.GetHash().ToString().c_str());
                     wtx.MarkDirty();
                     wtx.WriteToDisk();
                 }
@@ -3160,7 +3160,7 @@ void CWallet::FixSpentCoins(int& nMismatchFound, int64_t& nBalanceInQuestion, bo
         {
             if (IsMine(pcoin->vout[n]) && pcoin->IsSpent(n) && (txindex.vSpent.size() <= n || txindex.vSpent[n].IsNull()))
             {
-                printf("FixSpentCoins found lost coin %s TRC %s[%d], %s\n",
+                printf("FixSpentCoins found lost coin %s FSC2 %s[%d], %s\n",
                     FormatMoney(pcoin->vout[n].nValue).c_str(), pcoin->GetHash().ToString().c_str(), n, fCheckOnly? "repair not attempted" : "repairing");
                 nMismatchFound++;
                 nBalanceInQuestion += pcoin->vout[n].nValue;
@@ -3172,7 +3172,7 @@ void CWallet::FixSpentCoins(int& nMismatchFound, int64_t& nBalanceInQuestion, bo
             }
             else if (IsMine(pcoin->vout[n]) && !pcoin->IsSpent(n) && (txindex.vSpent.size() > n && !txindex.vSpent[n].IsNull()))
             {
-                printf("FixSpentCoins found spent coin %s TRC %s[%d], %s\n",
+                printf("FixSpentCoins found spent coin %s FSC2 %s[%d], %s\n",
                     FormatMoney(pcoin->vout[n].nValue).c_str(), pcoin->GetHash().ToString().c_str(), n, fCheckOnly? "repair not attempted" : "repairing");
                 nMismatchFound++;
                 nBalanceInQuestion += pcoin->vout[n].nValue;
